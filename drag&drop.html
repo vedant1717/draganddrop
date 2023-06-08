@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graydot Technologies</title>
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #fff;
+            background-color: #000;
+            padding: 10px;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .drag-container,
+        .drop-container {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .drag-container {
+            margin-right: 10px;
+        }
+        
+        .drag-item {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f2f2f2;
+            cursor: move;
+        }
+        
+        .drag-item.dragging {
+            background-color: lightblue;
+        }
+        
+        .drag-item.dropped {
+            background-color: skyblue;
+        }
+        
+        .drop-container {
+            background-color: #f9f9f9;
+            overflow-y: auto; /* Enable vertical scroll when items exceed container height */
+        }
+        
+        .success-message {
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #555;
+        }
+        
+        @media screen and (max-width: 600px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .drag-container,
+            .drop-container {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .drag-container {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Graydot Technologies</h1>
+    
+    <div class="container">
+        <div class="drag-container">
+            <h3>Drag Container</h3>
+            <div class="drag-item" draggable="true">Item 1</div>
+            <div class="drag-item" draggable="true">Item 2</div>
+            <div class="drag-item" draggable="true">Item 3</div>
+        </div>
+        
+        <div class="drop-container" id="dropContainer">
+            <h3>Drop Container</h3>
+        </div>
+    </div>
+    
+    <div id="message"></div>
+    
+    <button onclick="resetContainers()">Reset</button>
+    
+    <script>
+        var dragContainer = document.querySelector('.drag-container');
+        var dropContainer = document.getElementById('dropContainer');
+        
+        // Add event listeners for the dragstart, dragend, dragover, and drop events
+        dragContainer.addEventListener('dragstart', dragStart);
+        dragContainer.addEventListener('dragend', dragEnd);
+        dropContainer.addEventListener('dragover', dragOver);
+        dropContainer.addEventListener('drop', drop);
+        
+        // Handle the dragstart event
+        function dragStart(event) {
+            // Set the data being dragged and its format
+            event.dataTransfer.setData('text/plain', event.target.innerText);
+            
+            // Change the appearance of the dragged item
+            event.target.classList.add('dragging');
+        }
+        
+        // Handle the dragend event
+        function dragEnd(event) {
+            // Reset the appearance of the dragged item
+            event.target.classList.remove('dragging');
+        }
+        
+        // Handle the dragover event
+        function dragOver(event) {
+            // Prevent default to allow drop
+            event.preventDefault();
+        }
+        
+        // Handle the drop event
+        function drop(event) {
+            // Prevent default to avoid opening a new tab on drop
+            event.preventDefault();
+            
+            // Get the dropped data
+            var data = event.dataTransfer.getData('text/plain');
+            
+            // Create a new element for the dropped item
+            var newItem = document.createElement('div');
+            newItem.innerText = data;
+            newItem.classList.add('drag-item');
+            newItem.classList.add('dropped');
+            
+            // Append the new item to the drop container
+            event.target.appendChild(newItem);
+            
+            // Display the success message
+            var message = document.getElementById('message');
+            message.innerText = 'Item dropped successfully!';
+            message.classList.add('success-message');
+        }
+        
+        // Reset the containers and the success message
+        function resetContainers() {
+            var dragContainer = document.querySelector('.drag-container');
+            var dropContainer = document.getElementById('dropContainer');
+            var message = document.getElementById('message');
+            
+            // Clear the drop container
+            dropContainer.innerHTML = '<h3>Drop Container</h3>';
+            
+            // Reset the drag container
+            dragContainer.innerHTML = `
+                <h3>Drag Container</h3>
+                <div class="drag-item" draggable="true">Item 1</div>
+                <div class="drag-item" draggable="true">Item 2</div>
+                <div class="drag-item" draggable="true">Item 3</div>
+            `;
+            
+            // Reset the success message
+            message.innerText = '';
+            message.classList.remove('success-message');
+            
+            // Reattach event listeners to the new drag items
+            var dragItems = document.querySelectorAll('.drag-item');
+            dragItems.forEach(function(item) {
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragend', dragEnd);
+            });
+        }
+    </script>
+</body>
+</html>
